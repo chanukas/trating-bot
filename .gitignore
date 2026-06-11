@@ -1,0 +1,34 @@
+# Python
+__pycache__/
+*.py[cod]
+*.pyo
+.venv/
+venv/
+env/
+*.egg-info/
+dist/
+build/
+.pytest_cache/
+
+# Environment & secrets
+.env
+.env.*
+*.key
+
+# Data cache
+data_cache/
+
+# Generated images / output
+*.png
+
+# Node.js
+node_modules/
+btc-breakout-alert/dist/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
