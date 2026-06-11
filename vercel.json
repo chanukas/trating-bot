@@ -1,0 +1,5 @@
+{
+  "buildCommand": "cd btc-breakout-alert && npm install && npm run build",
+  "outputDirectory": "btc-breakout-alert/dist",
+  "installCommand": "echo skip"
+}
