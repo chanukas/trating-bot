@@ -25,6 +25,10 @@ data_cache/
 node_modules/
 btc-breakout-alert/dist/
 
+# Poller alert state (runtime; persisted via CI cache, not git)
+.poll-state.json
+btc-breakout-alert/.poll-state.json
+
 # OS
 .DS_Store
 Thumbs.db

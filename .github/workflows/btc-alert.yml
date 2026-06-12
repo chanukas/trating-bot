@@ -40,6 +40,16 @@ jobs:
       - name: Install deps
         working-directory: btc-breakout-alert
         run: npm install --include=dev
+      # Persist the "last alerted candle" state across runs so each breakout
+      # alerts exactly once (and is still caught if a cron run is delayed).
+      # Rolling key + restore-keys prefix is the standard mutable-cache pattern.
+      - name: Restore alert state
+        uses: actions/cache@v4
+        with:
+          path: btc-breakout-alert/.poll-state.json
+          key: poll-state-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            poll-state-
       - name: Poll and alert
         working-directory: btc-breakout-alert
         env:
@@ -48,9 +58,10 @@ jobs:
           # GitHub runners are in geo-blocked regions for api.binance.com (HTTP
           # 451). Use Binance's public market-data mirror instead.
           BINANCE_REST_BASE: https://data-api.binance.vision
+          STATE_FILE: .poll-state.json
           # Optional tuning via repository variables (Settings → Variables):
           TIMEFRAME: ${{ vars.TIMEFRAME || '1h' }}
-          POLL_WINDOW_MIN: ${{ vars.POLL_WINDOW_MIN || '15' }}
+          POLL_MAX_AGE_MIN: ${{ vars.POLL_MAX_AGE_MIN || '' }}
           LOOKBACK: ${{ vars.LOOKBACK || '' }}
           VOLUME_MULTIPLIER: ${{ vars.VOLUME_MULTIPLIER || '' }}
           CVD_FILTER: ${{ vars.CVD_FILTER || '' }}

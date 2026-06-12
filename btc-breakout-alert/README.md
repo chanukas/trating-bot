@@ -161,10 +161,11 @@ It runs every 15 min by default. Honest limits of the free cron approach:
 
 - **Close-mode only** and alerts arrive **a few minutes after** the candle closes — fine for
   1h/4h, not for fast scalping. The cron interval must be **≤ your timeframe**.
-- **Stateless de-dup:** an alert fires only if the latest candle closed within
-  `POLL_WINDOW_MIN` minutes (default 15 — keep it equal to the cron interval). GitHub cron is
-  best-effort and can be delayed under load, so a badly delayed run **misses** that candle's
-  alert rather than sending a duplicate.
+- **Stateful de-dup:** the last alerted candle is remembered in `.poll-state.json`, persisted
+  across runs via the Actions cache. Each breakout alerts **exactly once**, by whichever run
+  first sees it — so a delayed or dropped cron run (GitHub cron is best-effort) still catches
+  it on a later run within the same candle instead of missing it. If the cache is ever lost,
+  `POLL_MAX_AGE_MIN` (default 2× the timeframe) prevents re-alerting an implausibly old candle.
 - Scheduled workflows are paused after 60 days of no repo activity (a commit re-arms them).
 
 Run it locally the same way to test: `TELEGRAM_TOKEN=… TELEGRAM_CHAT_ID=… npm run poll`.
