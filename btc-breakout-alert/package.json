@@ -10,6 +10,7 @@
     "test": "vitest run",
     "test:watch": "vitest",
     "backtest": "tsx scripts/backtest.ts",
+    "makerfill": "tsx scripts/makerfill.ts",
     "watch": "tsx scripts/watch.ts",
     "poll": "tsx scripts/poll.ts"
   },

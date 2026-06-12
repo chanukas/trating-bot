@@ -74,7 +74,10 @@ jobs:
           BUFFER_PCT: ${{ vars.BUFFER_PCT || '' }}
           CVD_FILTER: ${{ vars.CVD_FILTER || '' }}
           CVD_LOOKBACK: ${{ vars.CVD_LOOKBACK || '' }}
-          SQUEEZE_FILTER: ${{ vars.SQUEEZE_FILTER || '' }}
+          # Default ON for the 1h alerts: passed pre-registered walk-forward
+          # H4 (test_h4_squeeze.py, +0.086R pooled OOS) and was corroborated by
+          # the 2026-06-12 bridge probe on this exact signal code.
+          SQUEEZE_FILTER: ${{ vars.SQUEEZE_FILTER || 'true' }}
           SQUEEZE_PCT: ${{ vars.SQUEEZE_PCT || '' }}
           SQUEEZE_WITHIN: ${{ vars.SQUEEZE_WITHIN || '' }}
           SQUEEZE_LOOKBACK: ${{ vars.SQUEEZE_LOOKBACK || '' }}
