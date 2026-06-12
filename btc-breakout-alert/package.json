@@ -9,7 +9,9 @@
     "preview": "vite preview",
     "test": "vitest run",
     "test:watch": "vitest",
-    "backtest": "tsx scripts/backtest.ts"
+    "backtest": "tsx scripts/backtest.ts",
+    "watch": "tsx scripts/watch.ts",
+    "poll": "tsx scripts/poll.ts"
   },
   "dependencies": {
     "lightweight-charts": "^5.2.0",

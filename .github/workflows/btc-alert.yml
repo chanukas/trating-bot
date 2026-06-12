@@ -1,0 +1,56 @@
+# Free background BTC breakout alerts via GitHub Actions cron.
+#
+# Runs scripts/poll.ts on a schedule: it fetches recent Binance klines, replays
+# the production strategy, and sends a Telegram message when the just-closed
+# candle is a fresh breakout. No always-on server needed.
+#
+# Setup (one time):
+#   Repo → Settings → Secrets and variables → Actions → New repository secret
+#     TELEGRAM_TOKEN    = your bot token
+#     TELEGRAM_CHAT_ID  = your chat id
+#   (Optional) add repository *variables* to tune: TIMEFRAME, POLL_WINDOW_MIN, etc.
+#
+# Notes:
+#   - GitHub cron is best-effort and can be delayed several minutes under load;
+#     fine for 1h/4h alerts, not for fast scalping timeframes.
+#   - The schedule below runs every 15 min. Keep POLL_WINDOW_MIN equal to the
+#     interval (15) so each candle alerts at most once. The cron interval must
+#     be <= your TIMEFRAME.
+#   - Trigger a manual test run anytime from the Actions tab (workflow_dispatch).
+name: BTC breakout alert
+
+on:
+  schedule:
+    - cron: "*/15 * * * *"
+  workflow_dispatch: {}
+
+# Don't pile up overlapping runs if one is slow.
+concurrency:
+  group: btc-alert
+  cancel-in-progress: false
+
+jobs:
+  poll:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - name: Install deps
+        working-directory: btc-breakout-alert
+        run: npm install --include=dev
+      - name: Poll and alert
+        working-directory: btc-breakout-alert
+        env:
+          TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
+          TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # Optional tuning via repository variables (Settings → Variables):
+          TIMEFRAME: ${{ vars.TIMEFRAME || '1h' }}
+          POLL_WINDOW_MIN: ${{ vars.POLL_WINDOW_MIN || '15' }}
+          LOOKBACK: ${{ vars.LOOKBACK || '' }}
+          VOLUME_MULTIPLIER: ${{ vars.VOLUME_MULTIPLIER || '' }}
+          CVD_FILTER: ${{ vars.CVD_FILTER || '' }}
+          SQUEEZE_FILTER: ${{ vars.SQUEEZE_FILTER || '' }}
+          COOLDOWN: ${{ vars.COOLDOWN || '' }}
+        run: npm run poll
