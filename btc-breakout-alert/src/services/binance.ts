@@ -6,7 +6,14 @@ import type { Candle, ConnStatus, Timeframe } from '../types';
 
 export const SYMBOL = 'BTCUSDT';
 
-const REST_BASE = 'https://api.binance.com';
+// The browser uses api.binance.com directly. Headless runners in geo-blocked
+// clouds (e.g. GitHub Actions on Azure US, which gets HTTP 451) can point at
+// Binance's public market-data mirror via BINANCE_REST_BASE — same /api/v3
+// schema, no geo restriction. The typeof guard keeps this safe in the browser
+// build, where `process` is undefined.
+const REST_BASE =
+  (typeof process !== 'undefined' && process.env?.BINANCE_REST_BASE?.trim()) ||
+  'https://api.binance.com';
 // Binance exposes the same stream on both ports; alternating between them on
 // reconnect helps when a proxy/firewall blocks the non-standard one.
 const WS_HOSTS = ['wss://stream.binance.com:9443', 'wss://stream.binance.com:443'];
@@ -29,7 +36,7 @@ export interface KlineHistory {
  * the still-forming candle as the last element; it is split off so strategy
  * code only ever sees closed candles in `closed`.
  */
-export async function fetchKlines(timeframe: Timeframe, limit = 500): Promise<KlineHistory> {
+export async function fetchKlines(timeframe: Timeframe, limit = 1000): Promise<KlineHistory> {
   const url = `${REST_BASE}/api/v3/klines?symbol=${SYMBOL}&interval=${timeframe}&limit=${limit}`;
   const res = await fetch(url);
   if (!res.ok) {

@@ -45,6 +45,9 @@ jobs:
         env:
           TELEGRAM_TOKEN: ${{ secrets.TELEGRAM_TOKEN }}
           TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+          # GitHub runners are in geo-blocked regions for api.binance.com (HTTP
+          # 451). Use Binance's public market-data mirror instead.
+          BINANCE_REST_BASE: https://data-api.binance.vision
           # Optional tuning via repository variables (Settings → Variables):
           TIMEFRAME: ${{ vars.TIMEFRAME || '1h' }}
           POLL_WINDOW_MIN: ${{ vars.POLL_WINDOW_MIN || '15' }}
