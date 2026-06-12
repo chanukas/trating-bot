@@ -59,12 +59,24 @@ jobs:
           # 451). Use Binance's public market-data mirror instead.
           BINANCE_REST_BASE: https://data-api.binance.vision
           STATE_FILE: .poll-state.json
-          # Optional tuning via repository variables (Settings → Variables):
+          # Set repo variable TEST_ALERT=true to send one guaranteed test
+          # message (then delete it). Proves credentials + delivery.
+          TEST_ALERT: ${{ vars.TEST_ALERT || '' }}
+          # Optional tuning via repository variables (Settings → Variables).
+          # Unset → '' → the script falls back to DEFAULT_CONFIG.
           TIMEFRAME: ${{ vars.TIMEFRAME || '1h' }}
           POLL_MAX_AGE_MIN: ${{ vars.POLL_MAX_AGE_MIN || '' }}
           LOOKBACK: ${{ vars.LOOKBACK || '' }}
+          VOLUME_FILTER: ${{ vars.VOLUME_FILTER || '' }}
           VOLUME_MULTIPLIER: ${{ vars.VOLUME_MULTIPLIER || '' }}
+          VOLUME_PERIOD: ${{ vars.VOLUME_PERIOD || '' }}
+          BUFFER_FILTER: ${{ vars.BUFFER_FILTER || '' }}
+          BUFFER_PCT: ${{ vars.BUFFER_PCT || '' }}
           CVD_FILTER: ${{ vars.CVD_FILTER || '' }}
+          CVD_LOOKBACK: ${{ vars.CVD_LOOKBACK || '' }}
           SQUEEZE_FILTER: ${{ vars.SQUEEZE_FILTER || '' }}
+          SQUEEZE_PCT: ${{ vars.SQUEEZE_PCT || '' }}
+          SQUEEZE_WITHIN: ${{ vars.SQUEEZE_WITHIN || '' }}
+          SQUEEZE_LOOKBACK: ${{ vars.SQUEEZE_LOOKBACK || '' }}
           COOLDOWN: ${{ vars.COOLDOWN || '' }}
         run: npm run poll

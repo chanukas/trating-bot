@@ -32,7 +32,8 @@ export function flag(name: string): string | undefined {
 
 export function envBool(name: string, fallback: boolean): boolean {
   const v = process.env[name];
-  if (v === undefined) return fallback;
+  // Unset OR empty (CI passes `${{ vars.X || '' }}` for unset vars) → fallback.
+  if (v === undefined || v.trim() === '') return fallback;
   return /^(1|true|yes|on)$/i.test(v.trim());
 }
 

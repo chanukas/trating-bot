@@ -26,6 +26,7 @@ import { sendTelegram } from '../src/services/notify';
 import { scanHistory } from '../src/strategy/breakout';
 import {
   buildAlert,
+  envBool,
   envNum,
   log,
   readConfig,
@@ -56,6 +57,15 @@ function writeState(path: string, state: State): void {
 async function main(): Promise<void> {
   const { token, chatId } = readTelegramCreds();
   const timeframe = readTimeframe();
+
+  // TEST_ALERT=true sends one guaranteed message and exits — proves the
+  // credentials + CI→Telegram path without depending on a live breakout.
+  if (envBool('TEST_ALERT', false)) {
+    await sendTelegram(token, chatId, `✅ Test alert — BTC breakout watcher is wired up (${timeframe}). Real alerts fire on breakouts.`);
+    log('TEST_ALERT sent');
+    return;
+  }
+
   const config = readConfig();
   const statePath = (process.env.STATE_FILE ?? '.poll-state.json').trim();
   const maxAgeMin = envNum('POLL_MAX_AGE_MIN', (TIMEFRAME_SECONDS[timeframe] / 60) * 2);
